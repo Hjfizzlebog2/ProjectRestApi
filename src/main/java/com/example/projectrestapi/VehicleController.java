@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.CharEncoding;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,10 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.swing.text.html.HTMLDocument;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
@@ -63,9 +61,42 @@ public class VehicleController {
         return null;
     }
 
+    //NOTE: CURRENT METHOD IS SLOW, BUT IT WORKS. CAN REFACTOR LATER
+    // In order to delete, just read file line by line and do nothing if it is the vehicle you want to delete
     @RequestMapping(value = "/deleteVehicle/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteVehicle(@PathVariable("id") int id) throws IOException {
-        return null;
+        ObjectMapper mapper = new ObjectMapper();
+        File inventoryFile = new File("./inventory.txt");
+        File tempInventoryFile = new File("./tempInventory.txt");
+
+        // MAKE TEMP COPY OF FILE
+        FileUtils.copyFile(inventoryFile, tempInventoryFile);
+
+        // CLEAR OLD FILE
+        PrintWriter writer = new PrintWriter(inventoryFile);
+        writer.print("");
+        writer.close();
+
+        //TODO: Actual recreating and deletion is WIP
+
+        // START TO ADD BACK LINES TO FILE ONE BY ONE
+        boolean deletionIsSuccessful = false;
+        FileWriter output = new FileWriter(tempInventoryFile,true);
+            // EXCEPT IN THE CASE OF FILE
+            // USE BOOLEAN FLAG FOR DENOTING DELETION
+
+        // DELETE TEMP COPY
+        FileUtils.deleteQuietly(tempInventoryFile);
+
+        //RETURN ResponseEntity DEPENDING ON DELETION STATUS
+        if (deletionIsSuccessful) {
+            return new ResponseEntity<>("Deletion successful.",
+                    HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Deletion unsuccessful." +
+                    " ID not in inventory.", HttpStatus.OK);
+        }
+
     }
 
     @RequestMapping(value = "/getLatestVehicles", method=RequestMethod.GET)
