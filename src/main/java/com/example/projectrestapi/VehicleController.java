@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.CharEncoding;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.HTMLDocument;
 import java.io.*;
@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+@RestController
 public class VehicleController {
 
     @RequestMapping(value = "/addVehicle",method = RequestMethod.POST)
@@ -138,4 +139,25 @@ public class VehicleController {
         return latest;
     }
 
+    //SCHEDULED METHODS
+
+    @Scheduled(cron = "")
+    public void addVehicle() {
+
+    }
+
+    @Scheduled(cron = "")
+    public void deleteVehicle() {
+
+    }
+
+    @Scheduled(cron = "")
+    public void updateVehicle() {
+
+    }
+
+    @Scheduled(cron = "")
+    public void latestVehiclesReport() {
+
+    }
 }
