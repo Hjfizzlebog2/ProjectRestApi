@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.swing.text.html.HTMLDocument;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -34,9 +35,7 @@ public class VehicleController {
         //Append a new line character to the file
         //Above FileWriter "output" is automatically closed by the mapper
         FileUtils.writeStringToFile(new File("./inventory.txt"),
-                System.lineSeparator(),
-                CharEncoding.UTF_8,
-                true);
+                System.lineSeparator(), CharEncoding.UTF_8, true);
         return newVehicle;
     }
 
@@ -117,9 +116,26 @@ public class VehicleController {
 
     @RequestMapping(value = "/getLatestVehicles", method=RequestMethod.GET)
     public List<Vehicle> getLatestVehicles() throws IOException {
-        return null;
+        Vehicle currentVehicle = null;
+        ObjectMapper mapper = new ObjectMapper();
+        List<Vehicle> latest = new ArrayList<>();
+
+        Scanner fileScan = new Scanner(new File("./inventory.txt"));
+
+        //Read each vehicle from file
+        while (fileScan.hasNextLine()) {
+            String currentLine = fileScan.nextLine();
+            Vehicle vehicleInFile = mapper.readValue(currentLine,Vehicle.class);
+
+            //Next vehicle in file added to list.
+            latest.add(vehicleInFile);
+
+            //When file exceeds 10 vehicles, earlier vehicles are removed.
+            if(latest.size() == 10) {
+                latest.remove(0);
+            }
+        }
+        return latest;
     }
-
-
 
 }
