@@ -65,7 +65,6 @@ public class VehicleController {
     // In order to delete, just read file line by line and do nothing if it is the vehicle you want to delete
     @RequestMapping(value = "/deleteVehicle/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteVehicle(@PathVariable("id") int id) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
         File inventoryFile = new File("./inventory.txt");
         File tempInventoryFile = new File("./tempInventory.txt");
 
@@ -77,13 +76,30 @@ public class VehicleController {
         writer.print("");
         writer.close();
 
-        //TODO: Actual recreating and deletion is WIP
-
         // START TO ADD BACK LINES TO FILE ONE BY ONE
-        boolean deletionIsSuccessful = false;
         FileWriter output = new FileWriter(tempInventoryFile,true);
-            // EXCEPT IN THE CASE OF FILE
-            // USE BOOLEAN FLAG FOR DENOTING DELETION
+        Scanner tempInventoryFileScanner = new Scanner(tempInventoryFile);
+        ObjectMapper mapper = new ObjectMapper();
+        Vehicle currentVehicle = null;
+        boolean deletionIsSuccessful = false;
+        while (tempInventoryFileScanner.hasNextLine()) {
+            String currentLine = tempInventoryFileScanner.nextLine(); // get current line
+            currentVehicle = mapper.readValue(currentLine,Vehicle.class); // got current vehicle
+            if (deletionIsSuccessful == true || currentVehicle.getId() != id) { // as long as vehicle id does not match
+                //Serialize object to JSON and write to file
+                mapper.writeValue(output,currentVehicle); // write vehicle to file in JSON format
+
+                //Append a new line character to the file
+                //Above FileWriter "output" is automatically closed by the mapper
+                FileUtils.writeStringToFile(new File("./inventory.txt"),
+                        System.lineSeparator(),
+                        CharEncoding.UTF_8,
+                        true);
+            } else {
+                deletionIsSuccessful = true;
+                // by not writing data, we are therefore deleting it from the file
+            }
+        }
 
         // DELETE TEMP COPY
         FileUtils.deleteQuietly(tempInventoryFile);
@@ -94,7 +110,7 @@ public class VehicleController {
                     HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Deletion unsuccessful." +
-                    " ID not in inventory.", HttpStatus.OK);
+                    " ID not in inventory.", HttpStatus.BAD_REQUEST);
         }
 
     }
