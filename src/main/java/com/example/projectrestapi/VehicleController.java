@@ -2,6 +2,7 @@ package com.example.projectrestapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.CharEncoding;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,10 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.swing.text.html.HTMLDocument;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 public class VehicleController {
 
@@ -38,7 +44,18 @@ public class VehicleController {
 
     @RequestMapping(value = "/getVehicle/{id}", method = RequestMethod.GET)
     public Vehicle getVehicle(@PathVariable("id") int id) throws IOException {
-        return null;
+        Vehicle currentVehicle = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        Scanner fileScan = new Scanner(new File("./inventory.txt"));
+        while (fileScan.hasNextLine()) {
+            String currentLine = fileScan.nextLine();
+            Vehicle vehicleInFile = mapper.readValue(currentLine,Vehicle.class);
+            if (vehicleInFile.getId() == id) {
+                currentVehicle = vehicleInFile;
+            }
+        }
+        return currentVehicle;
     }
 
     @RequestMapping(value = "/updateVehicle", method = RequestMethod.PUT)

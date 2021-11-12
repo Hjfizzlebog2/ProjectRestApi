@@ -15,6 +15,7 @@ public class Vehicle implements Serializable {
     private int retailPrice;
     private int milesPerGallon;
     private boolean isFourWheelDrive;
+    private int id;
 
     // constructor
     public Vehicle(String make, String model, int modelYear, int price, int mpg, boolean isFourWheelDrive) {
@@ -32,6 +33,19 @@ public class Vehicle implements Serializable {
         this. modelYear = modelYear;
         this.retailPrice = retailPrice;
         this.isFourWheelDrive = isFourWheelDrive;
+    }
+
+    // third constructor
+    public Vehicle(int id,String makeModel,int modelYear, int retailPrice) {
+        this.id = id;
+        this.makeModel = makeModel;
+        this.modelYear = modelYear;
+        this.retailPrice = retailPrice;
+    }
+
+    // getter for id
+    public int getId() {
+        return id;
     }
 
     // getter for make
