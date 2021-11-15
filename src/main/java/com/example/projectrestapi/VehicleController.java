@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.text.html.HTMLDocument;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 @RestController
 public class VehicleController {
@@ -110,7 +107,7 @@ public class VehicleController {
                     HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Deletion unsuccessful." +
-                    " ID not in inventory.", HttpStatus.BAD_REQUEST);
+                    " ID not in inventory.", HttpStatus.NOT_FOUND);
         }
 
     }
@@ -146,9 +143,16 @@ public class VehicleController {
 
     }
 
-    @Scheduled(cron = "")
-    public void deleteVehicle() {
+    Random random = new Random();
+    static int startingID = 0;
 
+    @Scheduled(cron = "* */10 * * * *")
+    public void deleteVehicle() throws IOException {
+        //Generate random vehicle ID. Starting ID is incremented since adding vehicles is assumed.
+        int vehicleId = random.nextInt(100) + startingID;
+        //Make delete request
+        deleteVehicle(vehicleId);
+        startingID++;
     }
 
     @Scheduled(cron = "")
