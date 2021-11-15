@@ -135,33 +135,4 @@ public class VehicleController {
         }
         return latest;
     }
-
-    //SCHEDULED METHODS
-
-    @Scheduled(cron = "")
-    public void addVehicle() {
-
-    }
-
-    Random random = new Random();
-    static int startingID = 0;
-
-    @Scheduled(cron = "* */10 * * * *")
-    public void deleteVehicle() throws IOException {
-        //Generate random vehicle ID. Starting ID is incremented since adding vehicles is assumed.
-        int vehicleId = random.nextInt(100) + startingID;
-        //Make delete request
-        deleteVehicle(vehicleId);
-        startingID++;
-    }
-
-    @Scheduled(cron = "")
-    public void updateVehicle() {
-
-    }
-
-    @Scheduled(cron = "")
-    public void latestVehiclesReport() {
-
-    }
 }
