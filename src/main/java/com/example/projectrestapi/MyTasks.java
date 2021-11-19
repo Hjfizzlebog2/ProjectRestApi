@@ -71,8 +71,16 @@ public class MyTasks extends VehicleController{
 
     }
 
-    @Scheduled(cron = "")
-    public void latestVehiclesReport() {
+    @Scheduled(cron = "0 0 * * * *")
+    public void latestVehicleReport() throws IOException {
+        // create a list by calling getLatestVehicles method
+        List<Vehicle> latestList = getLatestVehicles();
 
+        // as long as the list is not null, loop through and print
+        if (!(latestList == null)) {
+            for (Vehicle currentVehicle : latestList) {
+                System.out.println(currentVehicle.printVehicle2());
+            }
+        }
     }
 }
