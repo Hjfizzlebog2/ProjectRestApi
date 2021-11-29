@@ -23,6 +23,11 @@ public class MyTasks extends VehicleController{
     Random rand = new Random();
 
     //SCHEDULED METHODS
+
+    /**
+     * Adds a vehicle every day of the month.
+     * @throws IOException when error with file handlings.
+     */
     @Scheduled(cron = "* * * 0/ * *")
     public void addVehicle() throws IOException {
         //Randomly Generate New Vehicle Data
@@ -59,6 +64,10 @@ public class MyTasks extends VehicleController{
 
     static int startingID = 0;
 
+    /**
+     *
+     * @throws IOException
+     */
     @Scheduled(cron = "* */10 * * * *")
     public void deleteVehicle() throws IOException {
         //Generate random vehicle ID. Starting ID is incremented since adding vehicles is assumed.
@@ -73,19 +82,19 @@ public class MyTasks extends VehicleController{
         restTemplate.put(url, newVehicle);
     }
 
-    private Vehicle getUpdate() {
-        String getUrl = "http://localhost:8080/getVehicle/{id}";
+    private Vehicle getUpdate(int id) {
+        String getUrl = "http://localhost:8080/getVehicle/" + id;
         return restTemplate.getForObject(getUrl, Vehicle.class);
     }
     @Scheduled(cron = "*/5 * * * * *")
     public void updateVehicle() throws IOException {
         //Randomly Generate New Vehicle Data
 
-        List<String> linesInFile = Files.readAllLines(Paths.get("randvehiclesrc.txt"));
-        String makeModel = linesInFile.get(rand.nextInt(linesInFile.size()-1));
+        List<String> lines = Files.readAllLines(Paths.get("randvehiclesrc.txt"));
+        String makeModel = lines.get(rand.nextInt(lines.size()-1));
 
-        int randomYear = rand.nextInt(30) + 1986;
-        int randomPrice = rand.nextInt(30000) + 15000;
+        int year = rand.nextInt(30) + 1986;
+        int price = rand.nextInt(30000) + 15000;
 
         //Check next Id is available
         while(getVehicle(idCounter) != null) {
@@ -93,10 +102,10 @@ public class MyTasks extends VehicleController{
         }
 
         //Create new Vehicle
-        Vehicle car2 = new Vehicle(idCounter, makeModel, randomYear, randomPrice);
+        Vehicle car2 = new Vehicle(idCounter, makeModel, year, price);
 
         doUpdate(car2);
-        System.out.println(getUpdate().getId());
+        System.out.println(getUpdate(idCounter));
     }
 
     @Scheduled(cron = "0 0 * * * *")
