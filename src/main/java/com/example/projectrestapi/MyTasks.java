@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +19,7 @@ import java.util.Scanner;
 public class MyTasks extends VehicleController{
 
     public static int idCounter = 0;
+    RestTemplate restTemplate = new RestTemplate();
 
     //SCHEDULED METHODS
     @Scheduled(cron = "* * * 0/ * *")
@@ -66,9 +68,21 @@ public class MyTasks extends VehicleController{
         startingID++;
     }
 
-    @Scheduled(cron = "")
-    public void updateVehicle() {
+    private void doUpdate(Vehicle newVehicle) {
+        String url = "http://localhost:8080/updateVehicle";
+        restTemplate.put(url, newVehicle);
+    }
 
+    private Vehicle getUpdate() {
+        String getUrl = "http://localhost:8080/getVehicle/%7Bid%7D";
+        return restTemplate.getForObject(getUrl, Vehicle.class);
+    }
+    @Scheduled(cron = "*/5 * * * * *")
+    public void updateVehicle() {
+        Vehicle car1 = new Vehicle(5, "Honda Civic", 2010, 20000);
+
+        doUpdate(car1);
+        System.out.println(getUpdate().getId());
     }
 
     @Scheduled(cron = "0 0 * * * *")
