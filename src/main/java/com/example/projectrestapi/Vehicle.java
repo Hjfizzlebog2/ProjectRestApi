@@ -140,7 +140,7 @@ public class Vehicle implements Serializable {
      * using the second constructor as well as returns the string
      */
     public String printVehicle2(){
-        String vehicleStr = modelYear + " " + makeModel + "\n" +
+        String vehicleStr = id + " " + makeModel + " " + modelYear + " " +
                 "$" + retailPrice;
 
         if(isFourWheelDrive) {
