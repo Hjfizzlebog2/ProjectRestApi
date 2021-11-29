@@ -3,7 +3,6 @@ package com.example.projectrestapi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 public class MyTasks extends VehicleController{
 
@@ -65,8 +63,8 @@ public class MyTasks extends VehicleController{
     static int startingID = 0;
 
     /**
-     *
-     * @throws IOException
+     * Deletes a random vehicle every 10 minutes.
+     * @throws IOException when error with file handling
      */
     @Scheduled(cron = "* */10 * * * *")
     public void deleteVehicle() throws IOException {
@@ -77,15 +75,31 @@ public class MyTasks extends VehicleController{
         startingID++;
     }
 
+    /**
+     * Helper for updateVehicle method that conducts the update
+     * @param newVehicle the Vehicle to put
+     */
     private void doUpdate(Vehicle newVehicle) {
         String url = "http://localhost:8080/updateVehicle";
         restTemplate.put(url, newVehicle);
     }
 
+    /**
+     * Helper for updateVehicle method that gets the update
+     *
+     * @param id the Vehicle id to get
+     * @return Vehicle object with given ID
+     */
     private Vehicle getUpdate(int id) {
         String getUrl = "http://localhost:8080/getVehicle/" + id;
         return restTemplate.getForObject(getUrl, Vehicle.class);
     }
+
+    /**
+     * Updates the the text file with a Vehicle every 5 seconds.
+     *
+     * @throws IOException when error with file handling
+     */
     @Scheduled(cron = "*/5 * * * * *")
     public void updateVehicle() throws IOException {
         //Randomly Generate New Vehicle Data
@@ -108,6 +122,11 @@ public class MyTasks extends VehicleController{
         System.out.println(getUpdate(idCounter));
     }
 
+    /**
+     * Prints the 10 latest Vehicle added at the top of every hour.
+     *
+     * @throws IOException when error with file handling
+     */
     @Scheduled(cron = "0 0 * * * *")
     public void latestVehicleReport() throws IOException {
         // create a list by calling getLatestVehicles method

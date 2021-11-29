@@ -2,23 +2,23 @@ package com.example.projectrestapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.CharEncoding;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.HTMLDocument;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
 public class VehicleController {
 
+    /**
+     * Adds a Vehicle to the text file.
+     * @param newVehicle Vehicle to be added
+     * @return Vehicle that is added
+     * @throws IOException when error with file handling
+     */
     @RequestMapping(value = "/addVehicle",method = RequestMethod.POST)
     public Vehicle addVehicle(@RequestBody Vehicle newVehicle) throws IOException {
         //ObjectMapper provides functionality for reading and writing JSON
@@ -37,6 +37,13 @@ public class VehicleController {
         return newVehicle;
     }
 
+    /**
+     * Gets Vehicle with given ID
+     *
+     * @param id the id of the vehicle to be searched for
+     * @return vehicle with given ID
+     * @throws IOException when error with file handling
+     */
     @RequestMapping(value = "/getVehicle/{id}", method = RequestMethod.GET)
     public Vehicle getVehicle(@PathVariable("id") int id) throws IOException {
         Vehicle currentVehicle = null;
@@ -53,6 +60,13 @@ public class VehicleController {
         return currentVehicle;
     }
 
+    /**
+     * Updates the vehicle with matching ID to newer edition of Vehicle
+     *
+     * @param newVehicle the Vehicle to be updated
+     * @return the newer edition of the Vehicle
+     * @throws IOException when error in file handling
+     */
     @RequestMapping(value = "/updateVehicle", method = RequestMethod.PUT)
     public Vehicle updateVehicle(@RequestBody Vehicle newVehicle) throws IOException {
         //Vehicle object to update in file, Object Mapper to read file, and a scanner class
@@ -78,6 +92,13 @@ public class VehicleController {
         return updatedVehicle;
     }
 
+    /**
+     * Deletes Vehicle from text file
+     *
+     * @param id id of Vehicle to be deleted
+     * @return ResponseEntity indicating if deletion is successful
+     * @throws IOException when error in file handling
+     */
     //NOTE: CURRENT METHOD IS SLOW, BUT IT WORKS. CAN REFACTOR LATER
     // In order to delete, just read file line by line and do nothing if it is the vehicle you want to delete
     @RequestMapping(value = "/deleteVehicle/{id}", method = RequestMethod.DELETE)
@@ -132,6 +153,12 @@ public class VehicleController {
 
     }
 
+    /**
+     * Gets the 10 most recent Vehicles in the text file
+     *
+     * @return List of 10 most recent Vehicles
+     * @throws IOException when error in file handling
+     */
     @RequestMapping(value = "/getLatestVehicles", method=RequestMethod.GET)
     public List<Vehicle> getLatestVehicles() throws IOException {
         Vehicle currentVehicle = null;
