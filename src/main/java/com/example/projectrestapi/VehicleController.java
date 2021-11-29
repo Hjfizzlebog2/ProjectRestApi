@@ -55,7 +55,27 @@ public class VehicleController {
 
     @RequestMapping(value = "/updateVehicle", method = RequestMethod.PUT)
     public Vehicle updateVehicle(@RequestBody Vehicle newVehicle) throws IOException {
-        return null;
+        //Vehicle object to update in file, Object Mapper to read file, and a scanner class
+        Vehicle updatedVehicle = null;
+        ObjectMapper mapper = new ObjectMapper();
+        Scanner fileScan = new Scanner(new File("./inventory.txt"));
+
+        //while file has a next line it will read line and deserialize it
+        while (fileScan.hasNextLine()) {
+            String currentLine = fileScan.nextLine();
+            Vehicle vehicleInFile = mapper.readValue(currentLine,Vehicle.class);
+
+            //if given vehicle parameter id matches the id in file it will update vehicle parameters to new vehicle.
+            if (vehicleInFile.getId() == newVehicle.getId()) {
+                updatedVehicle = vehicleInFile;
+                updatedVehicle.setMakeModel(newVehicle.getMakeModel());
+                updatedVehicle.setModelYear(newVehicle.getModelYear());
+                updatedVehicle.setRetailPrice(newVehicle.getRetailPrice());
+
+                mapper.writeValue(new File("./inventory.txt"), updatedVehicle);
+            }
+        }
+        return updatedVehicle;
     }
 
     //NOTE: CURRENT METHOD IS SLOW, BUT IT WORKS. CAN REFACTOR LATER
@@ -82,7 +102,7 @@ public class VehicleController {
         while (tempInventoryFileScanner.hasNextLine()) {
             String currentLine = tempInventoryFileScanner.nextLine(); // get current line
             currentVehicle = mapper.readValue(currentLine,Vehicle.class); // got current vehicle
-            if (deletionIsSuccessful == true || currentVehicle.getId() != id) { // as long as vehicle id does not match
+            if (deletionIsSuccessful || currentVehicle.getId() != id) { // as long as vehicle id does not match
                 //Serialize object to JSON and write to file
                 mapper.writeValue(output,currentVehicle); // write vehicle to file in JSON format
 

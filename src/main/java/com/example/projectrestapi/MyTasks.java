@@ -20,6 +20,7 @@ public class MyTasks extends VehicleController{
 
     public static int idCounter = 0;
     RestTemplate restTemplate = new RestTemplate();
+    Random rand = new Random();
 
     //SCHEDULED METHODS
     @Scheduled(cron = "* * * 0/ * *")
@@ -27,11 +28,11 @@ public class MyTasks extends VehicleController{
         //Randomly Generate New Vehicle Data
         Random rand = new Random();
 
-        List<String> lines = Files.readAllLines(Paths.get("randvehiclesrc.txt"));
-        String makeModel = lines.get(rand.nextInt(lines.size()-1));
+        List<String> linesInFile = Files.readAllLines(Paths.get("randvehiclesrc.txt"));
+        String makeModel = linesInFile.get(rand.nextInt(linesInFile.size()-1));
 
-        int year = rand.nextInt(30) + 1986;
-        int price = rand.nextInt(30000) + 15000;
+        int randomYear = rand.nextInt(30) + 1986;
+        int randomPrice = rand.nextInt(30000) + 15000;
 
         //Check next Id is available
         while(getVehicle(idCounter) != null) {
@@ -39,7 +40,7 @@ public class MyTasks extends VehicleController{
         }
 
         //Create new Vehicle
-        Vehicle newVehicle = new Vehicle(idCounter, makeModel, year, price);
+        Vehicle newVehicle = new Vehicle(idCounter, makeModel, randomYear, randomPrice);
 
         //ObjectMapper provides functionality for reading and writing JSON
         ObjectMapper mapper = new ObjectMapper();
@@ -56,13 +57,12 @@ public class MyTasks extends VehicleController{
                 System.lineSeparator(), CharEncoding.UTF_8, true);
     }
 
-    Random random = new Random();
     static int startingID = 0;
 
     @Scheduled(cron = "* */10 * * * *")
     public void deleteVehicle() throws IOException {
         //Generate random vehicle ID. Starting ID is incremented since adding vehicles is assumed.
-        int vehicleId = random.nextInt(idCounter);
+        int vehicleId = rand.nextInt(idCounter);
         //Make delete request
         deleteVehicle(vehicleId);
         startingID++;
@@ -74,14 +74,28 @@ public class MyTasks extends VehicleController{
     }
 
     private Vehicle getUpdate() {
-        String getUrl = "http://localhost:8080/getVehicle/%7Bid%7D";
+        String getUrl = "http://localhost:8080/getVehicle/{id}";
         return restTemplate.getForObject(getUrl, Vehicle.class);
     }
     @Scheduled(cron = "*/5 * * * * *")
-    public void updateVehicle() {
-        Vehicle car1 = new Vehicle(5, "Honda Civic", 2010, 20000);
+    public void updateVehicle() throws IOException {
+        //Randomly Generate New Vehicle Data
 
-        doUpdate(car1);
+        List<String> linesInFile = Files.readAllLines(Paths.get("randvehiclesrc.txt"));
+        String makeModel = linesInFile.get(rand.nextInt(linesInFile.size()-1));
+
+        int randomYear = rand.nextInt(30) + 1986;
+        int randomPrice = rand.nextInt(30000) + 15000;
+
+        //Check next Id is available
+        while(getVehicle(idCounter) != null) {
+            idCounter++;
+        }
+
+        //Create new Vehicle
+        Vehicle car2 = new Vehicle(idCounter, makeModel, randomYear, randomPrice);
+
+        doUpdate(car2);
         System.out.println(getUpdate().getId());
     }
 
